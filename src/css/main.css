@@ -1,0 +1,20 @@
+/**
+ * Custom CSS may be added here.
+ */
+
+.box {
+    width: 2.5rem;
+    display: inline-block;
+}
+
+.dev {
+    background-color: #348a34 !important;
+}
+
+.test {
+    background-color: #f39820 !important;
+}
+
+.prod {
+    background-color: #ea0606 !important;
+}
