@@ -23,7 +23,7 @@ chrome.runtime.onMessage.addListener(
                 sendResponse("OK");
                 break;
             case "GetSSOAccounts":
-                let my_items;
+                var my_items;
                 getAllStorageSyncData().then(ssoaccounts => {
                     my_items = ssoaccounts;
                     sendResponse(my_items);

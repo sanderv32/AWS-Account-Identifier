@@ -4,10 +4,10 @@ function getCookie(cname) {
     let ca = decodedCookie.split(';');
     for (let i = 0; i < ca.length; i++) {
         let c = ca[i];
-        while (c.charAt(0) === ' ') {
+        while (c.charAt(0) == ' ') {
             c = c.substring(1);
         }
-        if (c.indexOf(name) === 0) {
+        if (c.indexOf(name) == 0) {
             return c.substring(name.length, c.length);
         }
     }
@@ -24,14 +24,16 @@ chrome.runtime.sendMessage({ type: "GetAwsRegion" }, aws_region => {
     xhttp.send();
 
     xhttp.onload = function() {
-        let len = this.response.result.length
+        console.log(this.response);
 
-        let newData = [];
+        len = this.response.result.length
+
+        newData = [];
 
         for (i = 0; i < len; i += 1) {
 
-            if (this.response.result[i].applicationName === "AWS Account") {
-                let obj = {};
+            if (this.response.result[i].applicationName == "AWS Account") {
+                var obj = new Object();
                 obj.AccountId = this.response.result[i].searchMetadata.AccountId
                 obj.AccountName = this.response.result[i].searchMetadata.AccountName
                 newData.push(obj);
@@ -45,3 +47,4 @@ chrome.runtime.sendMessage({ type: "GetAwsRegion" }, aws_region => {
         );
     }
 });
+

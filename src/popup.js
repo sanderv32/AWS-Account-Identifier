@@ -1,23 +1,23 @@
 const addbutton = document.getElementById('add-account');
 
-$(document).ready(() => {
+$(document).ready(function() {
     $("#alert-message").hide();
     $("#alert-message-main").hide();
     $("#predefined-colors").hide();
-    $("#dev_color").click(() => {
+    $("#dev_color").click(function() {
         console.log("click")
         $("#input_color").val("#348a34");
     });
-    $("#test_color").click(() => {
+    $("#test_color").click(function() {
         console.log("click")
         $("#input_color").val("#f39820");
     });
-    $("#prod_color").click(() => {
+    $("#prod_color").click(function() {
         console.log("click")
         $("#input_color").val("#ea0606");
     });
 
-    $("#use-predefined-colors").change(() => {
+    $("#use-predefined-colors").change(function() {
         if ($(this).prop("checked")) {
             $("#predefined-colors").show();
         } else {
@@ -25,43 +25,43 @@ $(document).ready(() => {
         }
     });
 
-    $("input:radio[name='colors']").click(() => {
-        if ($(this).prop("id") === "dev-option") {
+    $("input:radio[name='colors']").click(function() {
+        if ($(this).prop("id") == "dev-option") {
             $("#input_color").val("#348a34");
-        } else if ($(this).prop("id") === "test-option") {
+        } else if ($(this).prop("id") == "test-option") {
             $("#input_color").val("#f39820");
-        } else if ($(this).prop("id") === "prod-option") {
+        } else if ($(this).prop("id") == "prod-option") {
             $("#input_color").val("#ea0606");
         }
         return true;
     });
 
-    $("#get-account").click(() => {
-        chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    $("#get-account").click(function() {
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
             aws_console_regex = new RegExp("(.*?)\.console\.aws\.amazon\.com(.*)");
             if (aws_console_regex.test(tabs[0].url)) {
-                chrome.tabs.sendMessage(tabs[0].id, { type: "getAccount" }, response => {
+                chrome.tabs.sendMessage(tabs[0].id, { type: "getAccount" }, function(response) {
                     $("#input_account").val(response.number);
                 });
             } else {
                 $("#alert-message").text("Current tab is not an AWS Console. Please select a tab that matches 'https://*.console.aws.amazon.com/*'");
-                $("#alert-message").fadeTo(2000, 500).slideUp(500, () => {
+                $("#alert-message").fadeTo(2000, 500).slideUp(500, function() {
                     $("#alert-message").slideUp(1000);
                 });
             }
         });
     });
 
-    let toastElList = [].slice.call(document.querySelectorAll('.toast'))
-    let toastList = toastElList.map(toastEl => {
+    var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+    var toastList = toastElList.map(function(toastEl) {
         return new bootstrap.Toast(toastEl)
     })
 
-    $('#myTab button').on('click', e => {
+    $('#myTab button').on('click', function(e) {
         e.preventDefault()
         $(this).tab('show');
 
-        chrome.runtime.sendMessage({ type: "GetSSOAccounts" }, response => {
+        chrome.runtime.sendMessage({ type: "GetSSOAccounts" }, (response) => {
             if (response) {
                 $("#import-sso-accounts").prop('disabled', false);
                 $("#import-sso-count").text(response.length);
@@ -93,11 +93,11 @@ function delete_account(o) {
 }
 
 function change_color(o) {
-    let p = o.srcElement.parentNode.parentNode;
+    var p = o.srcElement.parentNode.parentNode;
     console.log("change id:" + p.id + " to :" +
         o.srcElement.value);
 
-    chrome.storage.sync.get(p.id, results => {
+    chrome.storage.sync.get(p.id, (results) => {
 
         datos = results[p.id];
         datos["color"] = o.srcElement.value;
@@ -115,11 +115,11 @@ function change_color(o) {
 
 function change_description(o) {
 
-    let p = o.srcElement.parentNode.parentNode;
+    var p = o.srcElement.parentNode.parentNode;
     console.log("change id:" + p.id + " to :" +
         o.srcElement.value);
 
-    chrome.storage.sync.get(p.id, results => {
+    chrome.storage.sync.get(p.id, (results) => {
 
         datos = results[p.id];
         datos["description"] = o.srcElement.value;
@@ -140,7 +140,7 @@ let addedRows = 0;
 function AddRowToTable(AccountId, AccountName) {
     return new Promise((resolve, reject) => {
         let rowAdded = false
-        chrome.storage.sync.get(AccountId, results => {
+        chrome.storage.sync.get(AccountId, (results) => {
             if (!results[AccountId]) {
                 color = "#348a34";
                 if (AccountName.includes("dev")) {
@@ -162,12 +162,12 @@ function AddRowToTable(AccountId, AccountName) {
 }
 
 $('#import-sso-accounts').click(function() {
-    chrome.runtime.sendMessage({ type: "GetSSOAccounts" }, response => {
+    chrome.runtime.sendMessage({ type: "GetSSOAccounts" }, (response) => {
         console.log("Get Saved SSO data");
         console.log(response);
         addedRows = 0;
         response.forEach(element => {
-            let rowAdded = AddRowToTable(element.AccountId, element.AccountName).then(rowAdded => {
+            var rowAdded = AddRowToTable(element.AccountId, element.AccountName).then(rowAdded => {
                 if (rowAdded) {
                     addedRows++;
                     $("#toast-message-import-text").text("Added " + addedRows + " new accounts.")
@@ -175,7 +175,7 @@ $('#import-sso-accounts').click(function() {
             });
         });
 
-        if (addedRows === 0) {
+        if (addedRows == 0) {
             $("#toast-message-import-text").text("No new accounts found");
         }
 
@@ -185,7 +185,7 @@ $('#import-sso-accounts').click(function() {
     });
 });
 
-$('#save-region').click(() => {
+$('#save-region').click(function() {
     chrome.storage.local.set({'aws_region': $('#aws_region').val()});
 });
 
@@ -206,9 +206,9 @@ function AddRow(account, description, color) {
     $("#toast-message-text").text("Account " + account + " was succesfully added.")
 
 
-    let table = document.getElementById('aws_accounts');
-    let rowCount = table.rows.length;
-    let row = table.insertRow(rowCount);
+    var table = document.getElementById('aws_accounts');
+    var rowCount = table.rows.length;
+    var row = table.insertRow(rowCount);
 
     row.id = account
 
@@ -249,12 +249,12 @@ function AddRow(account, description, color) {
 
 }
 
-$('#add-account').click(() => {
+$('#add-account').click(function() {
     const account = $('#input_account').val();
     const description = $('#input_description').val();
     const color = $('#input_color').val();
 
-    if (account === "" || account.length !== 12) {
+    if (account == "" || account.length != 12) {
         $("#input_account").addClass("is-invalid");
         $("#account-invalid-feedback").text("Please enter a valid Account number.");
         return;
@@ -262,14 +262,14 @@ $('#add-account').click(() => {
         $("#input_account").removeClass("is-invalid");
     }
 
-    if (description === "") {
+    if (description == "") {
         $("#input_description").addClass("is-invalid");
         return;
     } else {
         $("#input_description").removeClass("is-invalid");
     }
 
-    chrome.storage.sync.get(account, results => {
+    chrome.storage.sync.get(account, (results) => {
         if (results[account]) {
             $("#account-invalid-feedback").text("Account already exists.");
             $("#input_account").addClass("is-invalid");
@@ -283,10 +283,10 @@ $('#add-account').click(() => {
 });
 
 function redraw_content() {
-    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
         aws_console_regex = new RegExp("(.*?)\.console\.aws\.amazon\.com(.*)");
         if (aws_console_regex.test(tabs[0].url)) {
-            chrome.tabs.sendMessage(tabs[0].id, { type: "drawDescription" }, response => {
+            chrome.tabs.sendMessage(tabs[0].id, { type: "drawDescription" }, function(response) {
                 //Nothing
             });
         }
@@ -299,21 +299,21 @@ function loadFromStorage() {
         $("#aws_region").val(response.aws_region || 'eu-central-1')
     });
 
-    chrome.storage.sync.get(null, items => {
-        let allKeys = Object.keys(items);
+    chrome.storage.sync.get(null, function(items) {
+        var allKeys = Object.keys(items);
         console.log(allKeys);
     });
 
     chrome.storage.sync.get(null, data => {
         if (data) {
             console.log(data)
-            let table = document.getElementById('aws_accounts');
-            let rowCount = 1;
+            var table = document.getElementById('aws_accounts');
+            var rowCount = 1;
 
             for (const [id, value] of Object.entries(data)) {
 
-                let row = table.insertRow(rowCount);
-                row.id = id;
+                var row = table.insertRow(rowCount);
+                row.id = id
 
                 rowCount++;
 
