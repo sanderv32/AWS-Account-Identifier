@@ -9,10 +9,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser:
+          - firefox
+          - chrome
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build
+      - name: Build ${{ matrix.browser }} extension
         run: |
-          tasks/build.py
+          tasks/build.py -b ${{ matrix.browser }} -s ./src/ -e aws-account-identifier
