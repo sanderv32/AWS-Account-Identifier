@@ -15,7 +15,8 @@ function getCookie(cname) {
 }
 
 chrome.runtime.sendMessage({ type: "GetAwsRegion" }, aws_region => {
-    const region = aws_region || 'eu-central-1';
+    // const region = aws_region || 'eu-central-1';
+    const region = document.querySelector('meta[name="region"]').content || 'eu-central-1';
     const xhttp = new XMLHttpRequest();
     xhttp.open("GET", "https://portal.sso."+region+".amazonaws.com/instance/appinstances");
     xhttp.responseType = 'json';
