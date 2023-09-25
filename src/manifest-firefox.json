@@ -1,28 +1,56 @@
 {
+   "version": "1.0.2",
+   "name": "AWS Account Identifier",
+   "description": "Adds a description with a specific color to the AWS's navigation bar depending on the account you are connected to.",
+   "permissions": [
+      "storage",
+      "tabs"
+   ],
+   "icons": {
+      "128": "icon.png"
+   },
    "action": {
       "default_popup": "popup.html",
       "default_title": "Options"
    },
+   "content_scripts": [
+      {
+         "js": [
+            "utils.js",
+            "main.js"
+         ],
+         "matches": [
+            "*://*.console.aws.amazon.com/*"
+         ],
+         "all_frames": true
+      }, {
+         "js": [
+            "utils.js",
+            "main-sso.js"
+         ],
+         "matches": [
+            "*://*.awsapps.com/start#/",
+            "*://*.awsapps.com/start/*"
+         ],
+         "all_frames": true
+      }
+   ],
    "background": {
-      "scripts": ["background.js"]
+      "scripts": [
+         "background.js"
+      ]
    },
-   "content_scripts": [ {
-      "js": [ "utils.js", "main.js" ],
-      "matches": [ "*://*.console.aws.amazon.com/*" ],
-      "all_frames": true
-   }, {
-      "js": [ "utils.js", "main-sso.js" ],
-      "matches": [ "*://*.awsapps.com/start#/", "*://*.awsapps.com/start/*" ],
-      "all_frames": true
-   } ],
-   "description": "Adds a description with a specific color to the AWS's navigation bar depending on the account you are connected to.",
-   "host_permissions": [ "*://*.console.aws.amazon.com/*" ],
-   "icons": {
-      "128": "icon.png"
-   },
+   "host_permissions": [
+      "*://*.console.aws.amazon.com/*",
+      "*://*.awsapps.com/start#/",
+      "*://*.awsapps.com/start/*"
+   ],
+   "optional_permissions": [],
    "manifest_version": 3,
-   "name": "AWS Account Identifier",
-   "permissions": [ "storage" ],
-   "update_url": "https://edge.microsoft.com/extensionwebstorebase/v1/crx",
-   "version": "1.0.2"
+   "browser_specific_settings": {
+      "gecko": {
+         "id": "sanderv32@gmail.com",
+         "strict_min_version": "54.0"
+      }
+   }
 }
