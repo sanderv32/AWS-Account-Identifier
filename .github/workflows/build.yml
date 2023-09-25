@@ -11,9 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        browser:
-          - firefox
-          - chrome
+        include:
+          - browser: firefox
+            extension: xpi
+          - browser: chrome
+            extension: zip
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,3 +23,11 @@ jobs:
       - name: Build ${{ matrix.browser }} extension
         run: |
           tasks/build.py -b ${{ matrix.browser }} -s ./src/ -e aws-account-identifier
+
+      - name: Upload
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref }}
+          file: aws-account-identifier.${{ matrix.extension }}
+          asset_name: aws-account-identifier.${{ matrix.extension }}
