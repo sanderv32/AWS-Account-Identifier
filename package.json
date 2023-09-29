@@ -1,0 +1,38 @@
+{
+  "name": "AWS-Account-Identifier",
+  "version": "1.0.3",
+  "private": true,
+  "description": "Identify AWS account on console page",
+  "scripts": {
+    "prettier": "npx prettier **/*.{md,html,json} -w",
+    "lint": "eslint **/*.js",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sanderv32/AWS-Account-Identifier.git"
+  },
+  "keywords": ["AWS","account","identify","console"],
+  "author": "Alexander Verhaar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sanderv32/AWS-Account-Identifier/issues"
+  },
+  "homepage": "https://github.com/sanderv32/AWS-Account-Identifier",
+  "devDependencies": {
+    "eslint": "~8.50.0",
+    "eslint-config-prettier": "~9.0.0",
+    "eslint-plugin-import": "~2.28.1",
+    "eslint-plugin-prettier": "~5.0.0",
+    "lint-staged": "~14.0.1",
+    "prettier": "~3.0.3"
+  },
+  "lint-staged": {
+    "**/*.js": [
+      "npx eslint --fix"
+    ],
+    "**/*.{md,html,json}": [
+      "npx prettier --write"
+    ]
+  }
+}

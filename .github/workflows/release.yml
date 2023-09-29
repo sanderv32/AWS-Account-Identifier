@@ -1,10 +1,10 @@
 name: Build
-run-name: "Build extensions"
+run-name: "Release extensions"
 
 on:
-  push:
-    branches:
-      - 'master'
+  release:
+    types:
+      - created
 
 jobs:
   build:
@@ -24,6 +24,12 @@ jobs:
       - name: Build ${{ matrix.browser }} extension
         run: |
           tasks/build.py -b ${{ matrix.browser }} -s ./src/ -e aws-account-identifier
+
+      - name: Set extension version
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.ref }}
+        run: |
 
       - name: Upload
         uses: svenstaro/upload-release-action@v2
