@@ -1,5 +1,5 @@
-var arn = JSON.parse(getCookie("aws-userInfo"))['arn'];
-var navHeader = document.getElementById("consoleNavHeader");
+const arn = JSON.parse(getCookie("aws-userInfo"))['arn'];
+let navHeader = document.getElementById("consoleNavHeader");
 const account = arn.split(':')[4];
 
 let observer = new MutationObserver(mutationRecords => {
@@ -32,10 +32,10 @@ function getCookie(cname) {
     let ca = decodedCookie.split(';');
     for (let i = 0; i < ca.length; i++) {
         let c = ca[i];
-        while (c.charAt(0) == ' ') {
+        while (c.charAt(0) === ' ') {
             c = c.substring(1);
         }
-        if (c.indexOf(name) == 0) {
+        if (c.indexOf(name) === 0) {
             return c.substring(name.length, c.length);
         }
     }
@@ -44,11 +44,11 @@ function getCookie(cname) {
 
 function drawDescription() {
     chrome.storage.sync.get(account, (results) => {
-        navHeader = document.getElementById("consoleNavHeader");
-        header = document.getElementById("aws-description-header");
-        span = document.getElementById("aws-description-span");
+        let navHeader = document.getElementById("consoleNavHeader");
+        let header = document.getElementById("aws-description-header");
+        let span = document.getElementById("aws-description-span");
 
-        datos = results[account];
+        let datos = results[account];
         if (datos) {
             if (header === null) {
                 header = document.createElement('div');

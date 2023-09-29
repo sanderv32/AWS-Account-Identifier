@@ -19,7 +19,7 @@ chrome.runtime.onMessage.addListener(
         switch (message.type) {
             case "SetSSOAccounts":
                 console.log("background SetAccount " + JSON.stringify(message.data));
-                chrome.storage.local.set({ ssoaccounts: message.data });
+                chrome.storage.local.set({ ssoaccounts: message.data }).then(()=>{});
                 sendResponse("OK");
                 break;
             case "GetSSOAccounts":

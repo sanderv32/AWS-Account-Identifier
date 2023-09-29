@@ -1,23 +1,21 @@
-const addbutton = document.getElementById('add-account');
-
-$(document).ready(function() {
+$(() => {
     $("#alert-message").hide();
     $("#alert-message-main").hide();
     $("#predefined-colors").hide();
-    $("#dev_color").click(function() {
+    $("#dev_color").on('click', function() {
         console.log("click")
         $("#input_color").val("#348a34");
     });
-    $("#test_color").click(function() {
+    $("#test_color").on('click',function() {
         console.log("click")
         $("#input_color").val("#f39820");
     });
-    $("#prod_color").click(function() {
+    $("#prod_color").on('click', function() {
         console.log("click")
         $("#input_color").val("#ea0606");
     });
 
-    $("#use-predefined-colors").change(function() {
+    $("#use-predefined-colors").on('change',function() {
         if ($(this).prop("checked")) {
             $("#predefined-colors").show();
         } else {
@@ -25,37 +23,37 @@ $(document).ready(function() {
         }
     });
 
-    $("input:radio[name='colors']").click(function() {
-        if ($(this).prop("id") == "dev-option") {
+    $("input:radio[name='colors']").on('click',function() {
+        if ($(this).prop("id") === "dev-option") {
             $("#input_color").val("#348a34");
-        } else if ($(this).prop("id") == "test-option") {
+        } else if ($(this).prop("id") === "test-option") {
             $("#input_color").val("#f39820");
-        } else if ($(this).prop("id") == "prod-option") {
+        } else if ($(this).prop("id") === "prod-option") {
             $("#input_color").val("#ea0606");
         }
         return true;
     });
 
-    $("#get-account").click(function() {
+    $("#get-account").on('click', function() {
         chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-            aws_console_regex = new RegExp("(.*?)\.console\.aws\.amazon\.com(.*)");
+            let aws_console_regex = new RegExp("(.*?)\.console\.aws\.amazon\.com(.*)");
             if (aws_console_regex.test(tabs[0].url)) {
                 chrome.tabs.sendMessage(tabs[0].id, { type: "getAccount" }, function(response) {
                     $("#input_account").val(response.number);
                 });
             } else {
-                $("#alert-message").text("Current tab is not an AWS Console. Please select a tab that matches 'https://*.console.aws.amazon.com/*'");
-                $("#alert-message").fadeTo(2000, 500).slideUp(500, function() {
+                $("#alert-message").text("Current tab is not an AWS Console. Please select a tab that matches 'https://*.console.aws.amazon.com/*'")
+                .fadeTo(2000, 500).slideUp(500, function() {
                     $("#alert-message").slideUp(1000);
                 });
             }
         });
     });
 
-    var toastElList = [].slice.call(document.querySelectorAll('.toast'))
-    var toastList = toastElList.map(function(toastEl) {
+    const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    const toastList = toastElList.map(function (toastEl) {
         return new bootstrap.Toast(toastEl)
-    })
+    });
 
     $('#myTab button').on('click', function(e) {
         e.preventDefault()
@@ -85,26 +83,26 @@ document.querySelectorAll('input').forEach(input => {
 function delete_account(o) {
     console.log(o);
 
-    var p = o.srcElement.parentNode.parentNode;
+    const p = o.target.parentNode.parentNode;
     p.parentNode.removeChild(p);
 
     console.log("remove id:" + p.id);
-    chrome.storage.sync.remove(p.id);
+    chrome.storage.sync.remove(p.id).then(()=>{});
 }
 
 function change_color(o) {
-    var p = o.srcElement.parentNode.parentNode;
+    const p = o.target.parentNode.parentNode;
     console.log("change id:" + p.id + " to :" +
-        o.srcElement.value);
+        o.target.value);
 
     chrome.storage.sync.get(p.id, (results) => {
 
-        datos = results[p.id];
-        datos["color"] = o.srcElement.value;
+        let datos = results[p.id];
+        datos["color"] = o.target.value;
         console.log(datos);
         chrome.storage.sync.set({
             [p.id]: datos
-        });
+        }).then(()=>{});
 
         $("#toast-main-message").toast("show");
         $("#toast-main-message-text").text("Color for account " + p.id + " was succesfully changed.")
@@ -115,19 +113,19 @@ function change_color(o) {
 
 function change_description(o) {
 
-    var p = o.srcElement.parentNode.parentNode;
+    const p = o.target.parentNode.parentNode;
     console.log("change id:" + p.id + " to :" +
-        o.srcElement.value);
+        o.target.value);
 
     chrome.storage.sync.get(p.id, (results) => {
 
-        datos = results[p.id];
-        datos["description"] = o.srcElement.value;
+        let datos = results[p.id];
+        datos["description"] = o.target.value;
         console.log(datos);
 
         chrome.storage.sync.set({
             [p.id]: datos
-        });
+        }).then(()=>{});
 
         $("#toast-main-message").toast("show");
         $("#toast-main-message-text").text("Description for account " + p.id + " was succesfully changed.")
@@ -142,7 +140,7 @@ function AddRowToTable(AccountId, AccountName) {
         let rowAdded = false
         chrome.storage.sync.get(AccountId, (results) => {
             if (!results[AccountId]) {
-                color = "#348a34";
+                let color = "#348a34";
                 if (AccountName.includes("dev")) {
                     color = "#348a34";
                 } else if (AccountName.includes("test")) {
@@ -161,13 +159,13 @@ function AddRowToTable(AccountId, AccountName) {
     });
 }
 
-$('#import-sso-accounts').click(function() {
+$('#import-sso-accounts').on('click', function() {
     chrome.runtime.sendMessage({ type: "GetSSOAccounts" }, (response) => {
         console.log("Get Saved SSO data");
         console.log(response);
         addedRows = 0;
         response.forEach(element => {
-            var rowAdded = AddRowToTable(element.AccountId, element.AccountName).then(rowAdded => {
+            const rowAdded = AddRowToTable(element.AccountId, element.AccountName).then(rowAdded => {
                 if (rowAdded) {
                     addedRows++;
                     $("#toast-message-import-text").text("Added " + addedRows + " new accounts.")
@@ -175,7 +173,7 @@ $('#import-sso-accounts').click(function() {
             });
         });
 
-        if (addedRows == 0) {
+        if (addedRows === 0) {
             $("#toast-message-import-text").text("No new accounts found");
         }
 
@@ -185,19 +183,19 @@ $('#import-sso-accounts').click(function() {
     });
 });
 
-$('#save-region').click(function() {
-    chrome.storage.local.set({'aws_region': $('#aws_region').val()});
+$('#save-region').on('click', function() {
+    chrome.storage.local.set({'aws_region': $('#aws_region').val()}).then(()=>{});
 });
 
 function AddRow(account, description, color) {
 
 
-    record = { "description": description, "color": color };
+    let record = { "description": description, "color": color };
 
     console.log("record:" + record);
     chrome.storage.sync.set({
         [account]: record
-    });
+    }).then(()=>{});
 
     $("#input_description").val("");
     $("#input_account").val("");
@@ -206,13 +204,13 @@ function AddRow(account, description, color) {
     $("#toast-message-text").text("Account " + account + " was succesfully added.")
 
 
-    var table = document.getElementById('aws_accounts');
-    var rowCount = table.rows.length;
-    var row = table.insertRow(rowCount);
+    const table = document.getElementById('aws_accounts');
+    const rowCount = table.rows.length;
+    const row = table.insertRow(rowCount);
 
     row.id = account
 
-    cell = row.insertCell(0);
+    let cell = row.insertCell(0);
     cell.style.width = "22%"
     const input_account = document.createElement("input");
     input_account.type = "text"
@@ -249,12 +247,12 @@ function AddRow(account, description, color) {
 
 }
 
-$('#add-account').click(function() {
+$('#add-account').on('click', function() {
     const account = $('#input_account').val();
     const description = $('#input_description').val();
     const color = $('#input_color').val();
 
-    if (account == "" || account.length != 12) {
+    if (account === "" || account.length !== 12) {
         $("#input_account").addClass("is-invalid");
         $("#account-invalid-feedback").text("Please enter a valid Account number.");
         return;
@@ -262,7 +260,7 @@ $('#add-account').click(function() {
         $("#input_account").removeClass("is-invalid");
     }
 
-    if (description == "") {
+    if (description === "") {
         $("#input_description").addClass("is-invalid");
         return;
     } else {
@@ -284,7 +282,7 @@ $('#add-account').click(function() {
 
 function redraw_content() {
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-        aws_console_regex = new RegExp("(.*?)\.console\.aws\.amazon\.com(.*)");
+        let aws_console_regex = new RegExp("(.*?)\.console\.aws\.amazon\.com(.*)");
         if (aws_console_regex.test(tabs[0].url)) {
             chrome.tabs.sendMessage(tabs[0].id, { type: "drawDescription" }, function(response) {
                 //Nothing
@@ -300,24 +298,24 @@ function loadFromStorage() {
     });
 
     chrome.storage.sync.get(null, function(items) {
-        var allKeys = Object.keys(items);
+        const allKeys = Object.keys(items);
         console.log(allKeys);
     });
 
     chrome.storage.sync.get(null, data => {
         if (data) {
             console.log(data)
-            var table = document.getElementById('aws_accounts');
-            var rowCount = 1;
+            const table = document.getElementById('aws_accounts');
+            let rowCount = 1;
 
             for (const [id, value] of Object.entries(data)) {
 
-                var row = table.insertRow(rowCount);
+                const row = table.insertRow(rowCount);
                 row.id = id
 
                 rowCount++;
 
-                cell = row.insertCell(0);
+                let cell = row.insertCell(0);
                 cell.style.width = "22%"
                 const input_account = document.createElement("input");
                 input_account.type = "text"
