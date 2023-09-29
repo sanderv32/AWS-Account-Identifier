@@ -1,4 +1,4 @@
-name: Build
+name: Release
 run-name: "Release extensions"
 
 on:
