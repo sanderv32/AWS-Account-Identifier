@@ -1,3 +1,6 @@
+name: Linting
+run-name: "Linting files"
+
 on:
   push
 
