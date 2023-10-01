@@ -142,7 +142,7 @@ function change_description(o) {
 
         $('#toast-main-message').toast('show');
         $('#toast-main-message-text').text(
-            'Description for account ' + p.id + ' was succesfully changed.'
+            'Description for account ' + p.id + ' was successfully changed.'
         );
 
         redraw_content();
