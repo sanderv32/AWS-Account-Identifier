@@ -7,11 +7,11 @@
       "service_worker": "background.js"
    },
    "content_scripts": [ {
-      "js": [ "utils.js", "main.js" ],
+      "js": [ "main.js" ],
       "matches": [ "*://*.console.aws.amazon.com/*" ],
       "all_frames": true
    }, {
-      "js": [ "utils.js", "main-sso.js" ],
+      "js": [ "main-sso.js" ],
       "matches": [ "*://*.awsapps.com/start#/", "*://*.awsapps.com/start/*" ]
    } ],
    "description": "Adds a description with a specific color to the AWS's navigation bar depending on the account you are connected to.",

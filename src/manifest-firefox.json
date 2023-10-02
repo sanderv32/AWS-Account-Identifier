@@ -16,7 +16,6 @@
    "content_scripts": [
       {
          "js": [
-            "utils.js",
             "main.js"
          ],
          "matches": [
@@ -25,7 +24,6 @@
          "all_frames": true
       }, {
          "js": [
-            "utils.js",
             "main-sso.js"
          ],
          "matches": [
