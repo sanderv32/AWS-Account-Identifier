@@ -13,7 +13,3 @@ function getCookie(cname) {
     }
     return '';
 }
-
-module.exports = {
-    getCookie
-}
