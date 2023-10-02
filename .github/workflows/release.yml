@@ -31,6 +31,13 @@ jobs:
         run: |
           tasks/versioning.py -v ${{ inputs.version }} package.json src/manifest-chrome.json src/manifest-firefox.json
 
+      - name: Push new version to master
+        run: |
+          git config --global user.name 'release-workflow'
+          git config --global user.email 'sanderv32@users.noreply.github.com'
+          git commit -am 'Updated files to version ${{ inputs.version }}'
+          git push
+
       - name: Build ${{ matrix.browser }} extension
         run: |
           tasks/build.py -b ${{ matrix.browser }} -s ./src/ -e aws-account-identifier
@@ -39,6 +46,6 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref }}
+          tag: ${{ inputs.version }}
           file: aws-account-identifier.${{ matrix.extension }}
           asset_name: aws-account-identifier.${{ matrix.extension }}
