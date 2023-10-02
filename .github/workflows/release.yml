@@ -2,7 +2,7 @@ name: Release
 run-name: "Release extensions"
 
 on:
-  workflow_run:
+  workflow_dispatch:
     inputs:
       version:
         description: "Version to build"
