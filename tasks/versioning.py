@@ -13,8 +13,6 @@ import click
 def main(version: str, version_files: list) -> int:
     for f in version_files:
         if os.path.isfile(f):
-            base_dir = PurePath(f).parents[0]
-            print(base_dir)
             with open(f, 'r') as reader:
                 buffer = reader.read()
             try:
@@ -22,6 +20,7 @@ def main(version: str, version_files: list) -> int:
             except json.JSONDecodeError as e:
                 print(f"Error decoding file {f}: {e.msg}")
                 return 2
+            print(f"Updating file {f} from version {buffer['version']} to {version}")
             buffer['version'] = version
             with open(f, 'w') as writer:
                 writer.write(json.dumps(buffer, indent=4))
