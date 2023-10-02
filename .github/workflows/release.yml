@@ -1,10 +1,13 @@
-name: Build
+name: Release
 run-name: "Release extensions"
 
 on:
-  release:
-    types:
-      - created
+  workflow_run:
+    inputs:
+      version:
+        description: "Version to build"
+        required: true
+        type: string
 
 jobs:
   build:
@@ -21,15 +24,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build ${{ matrix.browser }} extension
-        run: |
-          tasks/build.py -b ${{ matrix.browser }} -s ./src/ -e aws-account-identifier
-
       - name: Set extension version
         shell: bash
         env:
           RELEASE_TAG: ${{ github.ref }}
         run: |
+          tasks/versioning.py -v ${{ inputs.version }} package.json src/manifest-chrome.json src/manifest-firefox.json
+
+      - name: Build ${{ matrix.browser }} extension
+        run: |
+          tasks/build.py -b ${{ matrix.browser }} -s ./src/ -e aws-account-identifier
 
       - name: Upload
         uses: svenstaro/upload-release-action@v2
