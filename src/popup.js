@@ -385,7 +385,7 @@ function loadFromStorage() {
                 div_color.style.backgroundColor = value['color'];
                 div_color.value = value['color'];
                 div_color.className = 'clr-field';
-                div_color.setAttribute("data-coloris", '');
+                div_color.setAttribute('data-coloris', '');
                 div_color.addEventListener('change', change_color);
                 cell.appendChild(div_color);
 
@@ -402,4 +402,4 @@ function loadFromStorage() {
 }
 
 loadFromStorage();
-color_picker()
+color_picker();
