@@ -105,6 +105,7 @@ function delete_account(o) {
 function change_color(o) {
     const p = o.target.parentNode.parentNode;
     console.log('change id:' + p.id + ' to :' + o.target.value);
+    o.target.style.backgroundColor = o.target.value;
 
     chrome.storage.sync.get(p.id, (results) => {
         let datos = results[p.id];
@@ -315,6 +316,24 @@ function redraw_content() {
     });
 }
 
+function color_picker() {
+    chrome.storage.sync.get(null, (data) => {
+        if (data) {
+            for (const [id, value] of Object.entries(data)) {
+                // const cpicker = new Color_picker({
+                //     el: `cpicker-${id}`,
+                //     default_color: value['color']
+                // });
+                // cpicker.init();
+                Coloris.setInstance(`picker-${id}`, {
+                    defaultColor: value['color'],
+                    inline: true
+                });
+            }
+        }
+    });
+}
+
 function loadFromStorage() {
     chrome.storage.local.get(['aws_region'], (response) => {
         $('#aws_region').val(response.aws_region || 'eu-central-1');
@@ -359,12 +378,16 @@ function loadFromStorage() {
 
                 cell = row.insertCell(2);
                 cell.style.width = '80px';
-                const input_color = document.createElement('input');
-                input_color.type = 'color';
-                input_color.value = value['color'];
-                input_color.className = 'form-control form-control-color';
-                input_color.addEventListener('change', change_color);
-                cell.appendChild(input_color);
+                const div_color = document.createElement('input');
+                div_color.id = `cpicker-${id}`;
+                div_color.type = 'button';
+                div_color.style.width = '80px';
+                div_color.style.backgroundColor = value['color'];
+                div_color.value = value['color'];
+                div_color.className = 'clr-field';
+                div_color.setAttribute('data-coloris', '');
+                div_color.addEventListener('change', change_color);
+                cell.appendChild(div_color);
 
                 cell = row.insertCell(3);
                 const remove_button = document.createElement('button');
@@ -379,3 +402,4 @@ function loadFromStorage() {
 }
 
 loadFromStorage();
+color_picker();

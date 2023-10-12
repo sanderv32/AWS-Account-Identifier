@@ -24,5 +24,5 @@
    "name": "AWS Account Identifier",
    "permissions": [ "storage" ],
    "update_url": "https://edge.microsoft.com/extensionwebstorebase/v1/crx",
-   "version": "1.0.2"
+   "version": "1.0.4"
 }

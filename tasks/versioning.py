@@ -2,7 +2,6 @@
 import os.path
 import sys
 import json
-from pathlib import PurePath
 
 import click
 
