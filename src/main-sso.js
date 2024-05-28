@@ -14,10 +14,12 @@ function getCookie(cname) {
     return '';
 }
 
-chrome.runtime.sendMessage({ type: 'GetAwsRegion' }, (_aws_region) => {
+chrome.runtime.sendMessage({
+    type: 'GetAwsRegion'
+}, (_aws_region) => {
     // const region = aws_region || 'eu-central-1';
-    const region =
-        document.querySelector('meta[name="region"]').content || 'eu-central-1';
+    // const region = document.querySelector('meta[name="region"]').content || 'eu-central-1';
+    const region = JSON.parse(document.querySelector('script[id="env"]').text).region
     const xhttp = new XMLHttpRequest();
     xhttp.open(
         'GET',
@@ -34,7 +36,7 @@ chrome.runtime.sendMessage({ type: 'GetAwsRegion' }, (_aws_region) => {
     );
     xhttp.send();
 
-    xhttp.onload = function () {
+    xhttp.onload = function() {
         console.log(this.response);
 
         let len = this.response.result.length;
@@ -52,8 +54,7 @@ chrome.runtime.sendMessage({ type: 'GetAwsRegion' }, (_aws_region) => {
             }
         }
 
-        chrome.runtime.sendMessage(
-            {
+        chrome.runtime.sendMessage({
                 type: 'SetSSOAccounts',
                 data: JSON.parse(JSON.stringify(newData))
             },
