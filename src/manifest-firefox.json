@@ -28,7 +28,8 @@
                 "main-sso.js"
             ],
             "matches": [
-                "*://*.awsapps.com/start#/",
+                "*://*.awsapps.com/start/#/*",
+                "*://*.awsapps.com/start#/*",
                 "*://*.awsapps.com/start/*"
             ],
             "all_frames": true
@@ -41,7 +42,8 @@
     },
     "host_permissions": [
         "*://*.console.aws.amazon.com/*",
-        "*://*.awsapps.com/start#/",
+        "*://*.awsapps.com/start/#/*",
+        "*://*.awsapps.com/start#/*",
         "*://*.awsapps.com/start/*"
     ],
     "optional_permissions": [],

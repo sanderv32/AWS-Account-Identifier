@@ -21,7 +21,8 @@
                 "main-sso.js"
             ],
             "matches": [
-                "*://*.awsapps.com/start#/",
+                "*://*.awsapps.com/start/#/*",
+                "*://*.awsapps.com/start#/*",
                 "*://*.awsapps.com/start/*"
             ]
         }
