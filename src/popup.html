@@ -33,6 +33,10 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="import-sso-tab" data-bs-toggle="tab" data-bs-target="#import-sso" type="button" role="tab" aria-controls="profile" aria-selected="false">Import AWS SSO</button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="header-settings-tab" data-bs-toggle="tab" data-bs-target="#header-settings" type="button" role="tab" aria-controls="profile" aria-selected="false">Settings</button>
+        </li>
+
     </ul>
 
     <div class="tab-content">
@@ -152,9 +156,46 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="./popup.js"></script>
+        <div class="tab-pane fade" role="tabpanel" aria-labelledby="header-settings-tab" id="header-settings">
+            <div class="row">
+                <div class="col-sm mt-2">
+                    <h5>Header settings</h5>
+                </div>
+            </div>
+
+            <div class="row">
+                <label for="header-position" class="form-label">Alignment</label>
+                <div class="col-sm">
+                    <div class="btn-group" role="group" id="headerBtnGroup">
+                        <input type="radio" class="btn-check" name="header-position" id="header-left" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="header-left">Left</label>
+
+                        <input type="radio" class="btn-check" name="header-position" id="header-center" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="header-center">Center</label>
+
+                        <input type="radio" class="btn-check" name="header-position" id="header-right" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="header-right">Right</label>
+                    </div>
+                </div>
+                <br><br>
+                <label for="header-text-size" class="form-label">Text size</label>
+                <div class="col-sm">
+                    <input type="number" class="form-control" id="header-text-size" value="18">
+                </div>
+                <br><br>
+                <label for="header-format" class="form-label">Format</label>
+                <div class="col-sm">
+                    <input type="text" class="form-control" id="header-format" value="Account: {{account}} - {{description}}">
+                    <br>
+                    <div class="alert alert-primary" role="alert">
+                        You can use the following variables: {{account}}, {{description}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="./popup.js"></script>
 </body>
 
 </html>

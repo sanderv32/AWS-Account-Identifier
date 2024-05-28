@@ -18,3 +18,50 @@
 .prod {
     background-color: #ea0606 !important;
 }
+
+.diagonal-div {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    transform-origin: center;
+    border: 1px #000 solid;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    pointer-events: all;
+}
+
+.first-half {
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.second-half {
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+.overlay-text {
+    position: absolute;
+    font-size: 100%;
+    font-family: Impact, Charcoal, sans-serif;
+    -webkit-text-stroke-width: 1.5px;
+    -webkit-text-stroke-color: #ffffff;
+    -webkit-text-fill-color: #000000;
+    color: #fff;
+    pointer-events: none;
+}
+
+.first-half .overlay-text {
+    top: 5%;
+    left: 5%;
+}
+
+.second-half .overlay-text {
+    bottom: 5%;
+    right: 5%;
+}

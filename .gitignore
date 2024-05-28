@@ -1,3 +1,5 @@
 *.zip
 *.xpi
+src/manifest.json
 venv/
+node_modules/

@@ -36,7 +36,10 @@ $(() => {
 
     $('#get-account').on('click', function () {
         chrome.tabs.query(
-            { active: true, currentWindow: true },
+            {
+                active: true,
+                currentWindow: true
+            },
             function (tabs) {
                 let aws_console_regex = new RegExp(
                     '(.*?).console.aws.amazon.com(.*)'
@@ -44,7 +47,9 @@ $(() => {
                 if (aws_console_regex.test(tabs[0].url)) {
                     chrome.tabs.sendMessage(
                         tabs[0].id,
-                        { type: 'getAccount' },
+                        {
+                            type: 'getAccount'
+                        },
                         function (response) {
                             $('#input_account').val(response.number);
                         }
@@ -72,15 +77,20 @@ $(() => {
         e.preventDefault();
         $(this).tab('show');
 
-        chrome.runtime.sendMessage({ type: 'GetSSOAccounts' }, (response) => {
-            if (response) {
-                $('#import-sso-accounts').prop('disabled', false);
-                $('#import-sso-count').text(response.length);
-            } else {
-                $('#import-sso-accounts').prop('disabled', true);
-                $('#import-sso-count').text('');
+        chrome.runtime.sendMessage(
+            {
+                type: 'GetSSOAccounts'
+            },
+            (response) => {
+                if (response) {
+                    $('#import-sso-accounts').prop('disabled', false);
+                    $('#import-sso-count').text(response.length);
+                } else {
+                    $('#import-sso-accounts').prop('disabled', true);
+                    $('#import-sso-count').text('');
+                }
             }
-        });
+        );
     });
 });
 
@@ -103,13 +113,17 @@ function delete_account(o) {
 }
 
 function change_color(o) {
-    const p = o.target.parentNode.parentNode;
+    const p = o.target;
     console.log('change id:' + p.id + ' to :' + o.target.value);
-    o.target.style.backgroundColor = o.target.value;
+    p.style.background = p.value;
 
     chrome.storage.sync.get(p.id, (results) => {
         let datos = results[p.id];
-        datos['color'] = o.target.value;
+        if (o.target.hasAttribute('foreground')) {
+            datos.foreground = o.target.value;
+        } else {
+            datos.color = o.target.value;
+        }
         console.log(datos);
         chrome.storage.sync
             .set({
@@ -117,9 +131,15 @@ function change_color(o) {
             })
             .then(() => {});
 
+        const color_type = o.target.hasAttribute('foreground')
+            ? 'Foreground'
+            : 'Background';
         $('#toast-main-message').toast('show');
         $('#toast-main-message-text').text(
-            'Color for account ' + p.id + ' was succesfully changed.'
+            color_type +
+                ' color for account ' +
+                p.id +
+                ' was succesfully changed.'
         );
 
         redraw_content();
@@ -176,40 +196,50 @@ function AddRowToTable(AccountId, AccountName) {
 }
 
 $('#import-sso-accounts').on('click', function () {
-    chrome.runtime.sendMessage({ type: 'GetSSOAccounts' }, (response) => {
-        console.log('Get Saved SSO data');
-        console.log(response);
-        addedRows = 0;
-        response.forEach((element) => {
-            const _rowAdded = AddRowToTable(
-                element.AccountId,
-                element.AccountName
-            ).then((rowAdded) => {
-                if (rowAdded) {
-                    addedRows++;
-                    $('#toast-message-import-text').text(
-                        'Added ' + addedRows + ' new accounts.'
-                    );
-                }
+    chrome.runtime.sendMessage(
+        {
+            type: 'GetSSOAccounts'
+        },
+        (response) => {
+            console.log('Get Saved SSO data');
+            console.log(response);
+            addedRows = 0;
+            response.forEach((element) => {
+                const _rowAdded = AddRowToTable(
+                    element.AccountId,
+                    element.AccountName
+                ).then((rowAdded) => {
+                    if (rowAdded) {
+                        addedRows++;
+                        $('#toast-message-import-text').text(
+                            'Added ' + addedRows + ' new accounts.'
+                        );
+                    }
+                });
             });
-        });
 
-        if (addedRows === 0) {
-            $('#toast-message-import-text').text('No new accounts found');
+            if (addedRows === 0) {
+                $('#toast-message-import-text').text('No new accounts found');
+            }
+
+            $('#toast-message-import').toast('show');
         }
-
-        $('#toast-message-import').toast('show');
-    });
+    );
 });
 
 $('#save-region').on('click', function () {
     chrome.storage.local
-        .set({ aws_region: $('#aws_region').val() })
+        .set({
+            aws_region: $('#aws_region').val()
+        })
         .then(() => {});
 });
 
 function AddRow(account, description, color) {
-    let record = { description: description, color: color };
+    let record = {
+        description: description,
+        color: color
+    };
 
     console.log('record:' + record);
     chrome.storage.sync
@@ -301,30 +331,61 @@ $('#add-account').on('click', function () {
     });
 });
 
-function redraw_content() {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        let aws_console_regex = new RegExp('(.*?).console.aws.amazon.com(.*)');
-        if (aws_console_regex.test(tabs[0].url)) {
-            chrome.tabs.sendMessage(
-                tabs[0].id,
-                { type: 'drawDescription' },
-                function (_response) {
-                    //Nothing
-                }
-            );
-        }
+$('#header-settings-tab').on('hide.bs.tab', store_settings_tab);
+$('#header-left').on('change', store_settings_tab);
+$('#header-right').on('change', store_settings_tab);
+$('#header-center').on('change', store_settings_tab);
+$('#header-text-size').on('change', store_settings_tab);
+$('#header-format').on('change', store_settings_tab);
+
+function store_settings_tab() {
+    let header_bit_pattern = 0;
+    $('input[name="header-position"').each(function (index) {
+        header_bit_pattern += $(this).prop('checked') ? 1 << index : 0;
     });
+
+    chrome.storage.local
+        .set({
+            header_settings: {
+                alignment: header_bit_pattern,
+                size: $('#header-text-size').val(),
+                format: $('#header-format').val()
+            }
+        })
+        .then(() => {
+            redraw_content();
+        });
+}
+
+function redraw_content() {
+    chrome.tabs.query(
+        {
+            active: true,
+            currentWindow: true
+        },
+        function (tabs) {
+            let aws_console_regex = new RegExp(
+                '(.*?).console.aws.amazon.com(.*)'
+            );
+            if (aws_console_regex.test(tabs[0].url)) {
+                chrome.tabs.sendMessage(
+                    tabs[0].id,
+                    {
+                        type: 'drawDescription'
+                    },
+                    function (_response) {
+                        //Nothing
+                    }
+                );
+            }
+        }
+    );
 }
 
 function color_picker() {
     chrome.storage.sync.get(null, (data) => {
         if (data) {
             for (const [id, value] of Object.entries(data)) {
-                // const cpicker = new Color_picker({
-                //     el: `cpicker-${id}`,
-                //     default_color: value['color']
-                // });
-                // cpicker.init();
                 Coloris.setInstance(`picker-${id}`, {
                     defaultColor: value['color'],
                     inline: true
@@ -334,9 +395,70 @@ function color_picker() {
     });
 }
 
+function diagonal_div(cpickerId, foregroundColor, backgroundColor) {
+    const diagonal_div = document.createElement('div');
+    const first_half_overlay = document.createElement('div');
+    const second_half_overlay = document.createElement('div');
+    const first_half_span = document.createElement('span');
+    const second_half_span = document.createElement('span');
+    diagonal_div.className = 'diagonal-div';
+    first_half_overlay.className = 'overlay first-half';
+    second_half_overlay.className = 'overlay second-half';
+    first_half_overlay.value = foregroundColor;
+    second_half_overlay.value = backgroundColor;
+    first_half_overlay.setAttribute('data-coloris', '');
+    second_half_overlay.setAttribute('data-coloris', '');
+    first_half_overlay.setAttribute('foreground', '');
+    second_half_overlay.setAttribute('background', '');
+    first_half_overlay.style.background = foregroundColor;
+    second_half_overlay.style.background = backgroundColor;
+    first_half_overlay.addEventListener('change', change_color);
+    second_half_overlay.addEventListener('change', change_color);
+    first_half_overlay.id = cpickerId;
+    second_half_overlay.id = cpickerId;
+    first_half_span.className = 'overlay-text';
+    second_half_span.className = 'overlay-text';
+    diagonal_div.appendChild(first_half_overlay);
+    diagonal_div.appendChild(second_half_overlay);
+    first_half_overlay.appendChild(first_half_span);
+    second_half_overlay.appendChild(second_half_span);
+    first_half_span.innerHTML = 'F';
+    second_half_span.innerHTML = 'B';
+    return diagonal_div;
+}
+
 function loadFromStorage() {
     chrome.storage.local.get(['aws_region'], (response) => {
         $('#aws_region').val(response.aws_region || 'eu-central-1');
+    });
+
+    chrome.storage.local.get(['header_settings'], (response) => {
+        let settings = response.header_settings || {};
+        if (settings) {
+            let header_format =
+                settings.format || 'Account: {{account}} - {{description}}';
+            $('#header-format').val(header_format);
+
+            let header_size = settings.size || 18;
+            $('#header-text-size').val(header_size);
+
+            let header_bit_pattern = settings.alignment || 1;
+            for (let i = 0; i < 8; i++) {
+                switch (header_bit_pattern & (1 << i)) {
+                    case 1:
+                        $('#header-left').prop('checked', true);
+                        break;
+                    case 2:
+                        $('#header-center').prop('checked', true);
+                        break;
+                    case 4:
+                        $('#header-right').prop('checked', true);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
     });
 
     chrome.storage.sync.get(null, function (items) {
@@ -377,16 +499,16 @@ function loadFromStorage() {
                 cell.appendChild(input_description);
 
                 cell = row.insertCell(2);
+                cell.style.verticalAlign = 'middle';
                 cell.style.width = '80px';
-                const div_color = document.createElement('input');
+                const div_color = diagonal_div(
+                    id,
+                    value['foreground'] || '#FFF',
+                    value['color']
+                );
                 div_color.id = `cpicker-${id}`;
-                div_color.type = 'button';
                 div_color.style.width = '80px';
-                div_color.style.backgroundColor = value['color'];
-                div_color.value = value['color'];
-                div_color.className = 'clr-field';
-                div_color.setAttribute('data-coloris', '');
-                div_color.addEventListener('change', change_color);
+                div_color.style.height = '30px';
                 cell.appendChild(div_color);
 
                 cell = row.insertCell(3);
