@@ -1,5 +1,5 @@
 {
-    "version": "1.1.0",
+    "version": "1.1.1",
     "name": "AWS Account Identifier",
     "description": "Adds a description with a specific color to the AWS's navigation bar depending on the account you are connected to.",
     "permissions": [
