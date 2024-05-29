@@ -1,29 +1,20 @@
 $(() => {
     $('#alert-message').hide();
     $('#alert-message-main').hide();
-    $('#predefined-colors').hide();
-    $('#dev_color').on('click', function () {
+    $('#dev_color').on('click', function() {
         console.log('click');
         $('#input_color').val('#348a34');
     });
-    $('#test_color').on('click', function () {
+    $('#test_color').on('click', function() {
         console.log('click');
         $('#input_color').val('#f39820');
     });
-    $('#prod_color').on('click', function () {
+    $('#prod_color').on('click', function() {
         console.log('click');
         $('#input_color').val('#ea0606');
     });
 
-    $('#use-predefined-colors').on('change', function () {
-        if ($(this).prop('checked')) {
-            $('#predefined-colors').show();
-        } else {
-            $('#predefined-colors').hide();
-        }
-    });
-
-    $("input:radio[name='colors']").on('click', function () {
+    $("input:radio[name='colors']").on('click', function() {
         if ($(this).prop('id') === 'dev-option') {
             $('#input_color').val('#348a34');
         } else if ($(this).prop('id') === 'test-option') {
@@ -34,23 +25,21 @@ $(() => {
         return true;
     });
 
-    $('#get-account').on('click', function () {
-        chrome.tabs.query(
-            {
+    $('#get-account').on('click', function() {
+        chrome.tabs.query({
                 active: true,
                 currentWindow: true
             },
-            function (tabs) {
+            function(tabs) {
                 let aws_console_regex = new RegExp(
                     '(.*?).console.aws.amazon.com(.*)'
                 );
                 if (aws_console_regex.test(tabs[0].url)) {
                     chrome.tabs.sendMessage(
-                        tabs[0].id,
-                        {
+                        tabs[0].id, {
                             type: 'getAccount'
                         },
-                        function (response) {
+                        function(response) {
                             $('#input_account').val(response.number);
                         }
                     );
@@ -60,7 +49,7 @@ $(() => {
                             "Current tab is not an AWS Console. Please select a tab that matches 'https://*.console.aws.amazon.com/*'"
                         )
                         .fadeTo(2000, 500)
-                        .slideUp(500, function () {
+                        .slideUp(500, function() {
                             $('#alert-message').slideUp(1000);
                         });
                 }
@@ -69,16 +58,15 @@ $(() => {
     });
 
     const toastElList = [].slice.call(document.querySelectorAll('.toast'));
-    const _toastList = toastElList.map(function (toastEl) {
+    const _toastList = toastElList.map(function(toastEl) {
         return new bootstrap.Toast(toastEl); /* eslint no-undef: 0 */
     });
 
-    $('#myTab button').on('click', function (e) {
+    $('#myTab button').on('click', function(e) {
         e.preventDefault();
         $(this).tab('show');
 
-        chrome.runtime.sendMessage(
-            {
+        chrome.runtime.sendMessage({
                 type: 'GetSSOAccounts'
             },
             (response) => {
@@ -131,15 +119,15 @@ function change_color(o) {
             })
             .then(() => {});
 
-        const color_type = o.target.hasAttribute('foreground')
-            ? 'Foreground'
-            : 'Background';
+        const color_type = o.target.hasAttribute('foreground') ?
+            'Foreground' :
+            'Background';
         $('#toast-main-message').toast('show');
         $('#toast-main-message-text').text(
             color_type +
-                ' color for account ' +
-                p.id +
-                ' was succesfully changed.'
+            ' color for account ' +
+            p.id +
+            ' was succesfully changed.'
         );
 
         redraw_content();
@@ -177,6 +165,7 @@ function AddRowToTable(AccountId, AccountName) {
         chrome.storage.sync.get(AccountId, (results) => {
             if (!results[AccountId]) {
                 let color = '#348a34';
+                let foreground = 'white';
                 if (AccountName.includes('dev')) {
                     color = '#348a34';
                 } else if (AccountName.includes('test')) {
@@ -185,7 +174,7 @@ function AddRowToTable(AccountId, AccountName) {
                     color = '#ea0606';
                 }
 
-                AddRow(AccountId, AccountName, color);
+                AddRow(AccountId, AccountName, color, foreground);
                 rowAdded = true;
             }
             resolve(rowAdded);
@@ -195,9 +184,8 @@ function AddRowToTable(AccountId, AccountName) {
     });
 }
 
-$('#import-sso-accounts').on('click', function () {
-    chrome.runtime.sendMessage(
-        {
+$('#import-sso-accounts').on('click', function() {
+    chrome.runtime.sendMessage({
             type: 'GetSSOAccounts'
         },
         (response) => {
@@ -227,18 +215,19 @@ $('#import-sso-accounts').on('click', function () {
     );
 });
 
-$('#save-region').on('click', function () {
-    chrome.storage.local
+$('#save-region').on('click', function() {
+    chrome.storage.sync
         .set({
             aws_region: $('#aws_region').val()
         })
         .then(() => {});
 });
 
-function AddRow(account, description, color) {
+function AddRow(account, description, color, foregroundColor) {
     let record = {
         description: description,
-        color: color
+        color: color,
+        foreground: foregroundColor
     };
 
     console.log('record:' + record);
@@ -298,10 +287,11 @@ function AddRow(account, description, color) {
     redraw_content();
 }
 
-$('#add-account').on('click', function () {
+$('#add-account').on('click', function() {
     const account = $('#input_account').val();
     const description = $('#input_description').val();
     const color = $('#input_color').val();
+    // TODO: diagonal color picker needs to be implemented
 
     if (account === '' || account.length !== 12) {
         $('#input_account').addClass('is-invalid');
@@ -326,7 +316,7 @@ $('#add-account').on('click', function () {
             $('#input_account').addClass('is-invalid');
             return false;
         } else {
-            AddRow(account, description, color);
+            AddRow(account, description, '#FFF', '#888');
         }
     });
 });
@@ -340,11 +330,11 @@ $('#header-format').on('change', store_settings_tab);
 
 function store_settings_tab() {
     let header_bit_pattern = 0;
-    $('input[name="header-position"').each(function (index) {
+    $('input[name="header-position"').each(function(index) {
         header_bit_pattern += $(this).prop('checked') ? 1 << index : 0;
     });
 
-    chrome.storage.local
+    chrome.storage.sync
         .set({
             header_settings: {
                 alignment: header_bit_pattern,
@@ -358,22 +348,20 @@ function store_settings_tab() {
 }
 
 function redraw_content() {
-    chrome.tabs.query(
-        {
+    chrome.tabs.query({
             active: true,
             currentWindow: true
         },
-        function (tabs) {
+        function(tabs) {
             let aws_console_regex = new RegExp(
                 '(.*?).console.aws.amazon.com(.*)'
             );
             if (aws_console_regex.test(tabs[0].url)) {
                 chrome.tabs.sendMessage(
-                    tabs[0].id,
-                    {
+                    tabs[0].id, {
                         type: 'drawDescription'
                     },
-                    function (_response) {
+                    function(_response) {
                         //Nothing
                     }
                 );
@@ -428,11 +416,11 @@ function diagonal_div(cpickerId, foregroundColor, backgroundColor) {
 }
 
 function loadFromStorage() {
-    chrome.storage.local.get(['aws_region'], (response) => {
+    chrome.storage.sync.get(['aws_region'], (response) => {
         $('#aws_region').val(response.aws_region || 'eu-central-1');
     });
 
-    chrome.storage.local.get(['header_settings'], (response) => {
+    chrome.storage.sync.get(['header_settings'], (response) => {
         let settings = response.header_settings || {};
         if (settings) {
             let header_format =
@@ -461,7 +449,7 @@ function loadFromStorage() {
         }
     });
 
-    chrome.storage.sync.get(null, function (items) {
+    chrome.storage.sync.get(null, function(items) {
         const allKeys = Object.keys(items);
         console.log(allKeys);
     });

@@ -2,7 +2,7 @@ function getAllStorageSyncData() {
     // Immediately return a promise and start asynchronous work
     return new Promise((resolve, reject) => {
         // Asynchronously fetch all data from storage.sync.
-        chrome.storage.local.get(['ssoaccounts'], ({ ssoaccounts }) => {
+        chrome.storage.sync.get(['ssoaccounts'], ({ ssoaccounts }) => {
             // Pass any observed errors down the promise chain.
             if (chrome.runtime.lastError) {
                 return reject(chrome.runtime.lastError);
@@ -19,8 +19,10 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             console.log(
                 'background SetAccount ' + JSON.stringify(message.data)
             );
-            chrome.storage.local
-                .set({ ssoaccounts: message.data })
+            chrome.storage.sync
+                .set({
+                    ssoaccounts: message.data
+                })
                 .then(() => {});
             sendResponse('OK');
             break;
@@ -31,7 +33,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             });
             return true;
         case 'GetAwsRegion':
-            chrome.storage.local.get(['aws_region'], (response) => {
+            chrome.storage.sync.get(['aws_region'], (response) => {
                 sendResponse(response.aws_region);
             });
             return true;
