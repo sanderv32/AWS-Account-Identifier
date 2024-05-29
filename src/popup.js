@@ -1,7 +1,6 @@
 $(() => {
     $('#alert-message').hide();
     $('#alert-message-main').hide();
-    $('#predefined-colors').hide();
     $('#dev_color').on('click', function () {
         console.log('click');
         $('#input_color').val('#348a34');
@@ -13,14 +12,6 @@ $(() => {
     $('#prod_color').on('click', function () {
         console.log('click');
         $('#input_color').val('#ea0606');
-    });
-
-    $('#use-predefined-colors').on('change', function () {
-        if ($(this).prop('checked')) {
-            $('#predefined-colors').show();
-        } else {
-            $('#predefined-colors').hide();
-        }
     });
 
     $("input:radio[name='colors']").on('click', function () {
@@ -177,6 +168,7 @@ function AddRowToTable(AccountId, AccountName) {
         chrome.storage.sync.get(AccountId, (results) => {
             if (!results[AccountId]) {
                 let color = '#348a34';
+                let foreground = 'white';
                 if (AccountName.includes('dev')) {
                     color = '#348a34';
                 } else if (AccountName.includes('test')) {
@@ -185,7 +177,7 @@ function AddRowToTable(AccountId, AccountName) {
                     color = '#ea0606';
                 }
 
-                AddRow(AccountId, AccountName, color);
+                AddRow(AccountId, AccountName, color, foreground);
                 rowAdded = true;
             }
             resolve(rowAdded);
@@ -228,17 +220,18 @@ $('#import-sso-accounts').on('click', function () {
 });
 
 $('#save-region').on('click', function () {
-    chrome.storage.local
+    chrome.storage.sync
         .set({
             aws_region: $('#aws_region').val()
         })
         .then(() => {});
 });
 
-function AddRow(account, description, color) {
+function AddRow(account, description, color, foregroundColor) {
     let record = {
         description: description,
-        color: color
+        color: color,
+        foreground: foregroundColor
     };
 
     console.log('record:' + record);
@@ -302,6 +295,7 @@ $('#add-account').on('click', function () {
     const account = $('#input_account').val();
     const description = $('#input_description').val();
     const color = $('#input_color').val();
+    // TODO: diagonal color picker needs to be implemented
 
     if (account === '' || account.length !== 12) {
         $('#input_account').addClass('is-invalid');
@@ -326,7 +320,7 @@ $('#add-account').on('click', function () {
             $('#input_account').addClass('is-invalid');
             return false;
         } else {
-            AddRow(account, description, color);
+            AddRow(account, description, '#FFF', '#888');
         }
     });
 });
@@ -344,7 +338,7 @@ function store_settings_tab() {
         header_bit_pattern += $(this).prop('checked') ? 1 << index : 0;
     });
 
-    chrome.storage.local
+    chrome.storage.sync
         .set({
             header_settings: {
                 alignment: header_bit_pattern,
@@ -428,11 +422,11 @@ function diagonal_div(cpickerId, foregroundColor, backgroundColor) {
 }
 
 function loadFromStorage() {
-    chrome.storage.local.get(['aws_region'], (response) => {
+    chrome.storage.sync.get(['aws_region'], (response) => {
         $('#aws_region').val(response.aws_region || 'eu-central-1');
     });
 
-    chrome.storage.local.get(['header_settings'], (response) => {
+    chrome.storage.sync.get(['header_settings'], (response) => {
         let settings = response.header_settings || {};
         if (settings) {
             let header_format =

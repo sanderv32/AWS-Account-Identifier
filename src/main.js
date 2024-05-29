@@ -52,7 +52,7 @@ function drawDescription() {
     let header_format = 'Account: {{account}} - {{description}}';
     let header_align = 'left';
     let header_size = 18;
-    chrome.storage.local.get(['header_settings'], (response) => {
+    chrome.storage.sync.get(['header_settings'], (response) => {
         let settings = response.header_settings || {};
         if (settings) {
             header_format =
