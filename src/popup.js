@@ -1,20 +1,20 @@
 $(() => {
     $('#alert-message').hide();
     $('#alert-message-main').hide();
-    $('#dev_color').on('click', function() {
+    $('#dev_color').on('click', function () {
         console.log('click');
         $('#input_color').val('#348a34');
     });
-    $('#test_color').on('click', function() {
+    $('#test_color').on('click', function () {
         console.log('click');
         $('#input_color').val('#f39820');
     });
-    $('#prod_color').on('click', function() {
+    $('#prod_color').on('click', function () {
         console.log('click');
         $('#input_color').val('#ea0606');
     });
 
-    $("input:radio[name='colors']").on('click', function() {
+    $("input:radio[name='colors']").on('click', function () {
         if ($(this).prop('id') === 'dev-option') {
             $('#input_color').val('#348a34');
         } else if ($(this).prop('id') === 'test-option') {
@@ -25,21 +25,23 @@ $(() => {
         return true;
     });
 
-    $('#get-account').on('click', function() {
-        chrome.tabs.query({
+    $('#get-account').on('click', function () {
+        chrome.tabs.query(
+            {
                 active: true,
                 currentWindow: true
             },
-            function(tabs) {
+            function (tabs) {
                 let aws_console_regex = new RegExp(
                     '(.*?).console.aws.amazon.com(.*)'
                 );
                 if (aws_console_regex.test(tabs[0].url)) {
                     chrome.tabs.sendMessage(
-                        tabs[0].id, {
+                        tabs[0].id,
+                        {
                             type: 'getAccount'
                         },
-                        function(response) {
+                        function (response) {
                             $('#input_account').val(response.number);
                         }
                     );
@@ -49,7 +51,7 @@ $(() => {
                             "Current tab is not an AWS Console. Please select a tab that matches 'https://*.console.aws.amazon.com/*'"
                         )
                         .fadeTo(2000, 500)
-                        .slideUp(500, function() {
+                        .slideUp(500, function () {
                             $('#alert-message').slideUp(1000);
                         });
                 }
@@ -58,15 +60,16 @@ $(() => {
     });
 
     const toastElList = [].slice.call(document.querySelectorAll('.toast'));
-    const _toastList = toastElList.map(function(toastEl) {
+    const _toastList = toastElList.map(function (toastEl) {
         return new bootstrap.Toast(toastEl); /* eslint no-undef: 0 */
     });
 
-    $('#myTab button').on('click', function(e) {
+    $('#myTab button').on('click', function (e) {
         e.preventDefault();
         $(this).tab('show');
 
-        chrome.runtime.sendMessage({
+        chrome.runtime.sendMessage(
+            {
                 type: 'GetSSOAccounts'
             },
             (response) => {
@@ -119,15 +122,15 @@ function change_color(o) {
             })
             .then(() => {});
 
-        const color_type = o.target.hasAttribute('foreground') ?
-            'Foreground' :
-            'Background';
+        const color_type = o.target.hasAttribute('foreground')
+            ? 'Foreground'
+            : 'Background';
         $('#toast-main-message').toast('show');
         $('#toast-main-message-text').text(
             color_type +
-            ' color for account ' +
-            p.id +
-            ' was succesfully changed.'
+                ' color for account ' +
+                p.id +
+                ' was succesfully changed.'
         );
 
         redraw_content();
@@ -184,8 +187,9 @@ function AddRowToTable(AccountId, AccountName) {
     });
 }
 
-$('#import-sso-accounts').on('click', function() {
-    chrome.runtime.sendMessage({
+$('#import-sso-accounts').on('click', function () {
+    chrome.runtime.sendMessage(
+        {
             type: 'GetSSOAccounts'
         },
         (response) => {
@@ -215,7 +219,7 @@ $('#import-sso-accounts').on('click', function() {
     );
 });
 
-$('#save-region').on('click', function() {
+$('#save-region').on('click', function () {
     chrome.storage.sync
         .set({
             aws_region: $('#aws_region').val()
@@ -287,7 +291,7 @@ function AddRow(account, description, color, foregroundColor) {
     redraw_content();
 }
 
-$('#add-account').on('click', function() {
+$('#add-account').on('click', function () {
     const account = $('#input_account').val();
     const description = $('#input_description').val();
     const color = $('#input_color').val();
@@ -330,7 +334,7 @@ $('#header-format').on('change', store_settings_tab);
 
 function store_settings_tab() {
     let header_bit_pattern = 0;
-    $('input[name="header-position"').each(function(index) {
+    $('input[name="header-position"').each(function (index) {
         header_bit_pattern += $(this).prop('checked') ? 1 << index : 0;
     });
 
@@ -348,20 +352,22 @@ function store_settings_tab() {
 }
 
 function redraw_content() {
-    chrome.tabs.query({
+    chrome.tabs.query(
+        {
             active: true,
             currentWindow: true
         },
-        function(tabs) {
+        function (tabs) {
             let aws_console_regex = new RegExp(
                 '(.*?).console.aws.amazon.com(.*)'
             );
             if (aws_console_regex.test(tabs[0].url)) {
                 chrome.tabs.sendMessage(
-                    tabs[0].id, {
+                    tabs[0].id,
+                    {
                         type: 'drawDescription'
                     },
-                    function(_response) {
+                    function (_response) {
                         //Nothing
                     }
                 );
@@ -449,7 +455,7 @@ function loadFromStorage() {
         }
     });
 
-    chrome.storage.sync.get(null, function(items) {
+    chrome.storage.sync.get(null, function (items) {
         const allKeys = Object.keys(items);
         console.log(allKeys);
     });
