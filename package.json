@@ -41,6 +41,6 @@
         ]
     },
     "dependencies": {
-        "web-ext": "^8.0.0"
+        "web-ext": "^9.0.0"
     }
 }
